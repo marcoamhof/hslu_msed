@@ -27,10 +27,6 @@ obj
 appsettings.json
 local.settings.json
 
-# Python Tools for Visual Studio (PTVS)
-__pycache__
-*.pyc
-
 # Virtual environments
 .venv
 env/
