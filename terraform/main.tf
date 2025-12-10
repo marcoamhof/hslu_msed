@@ -101,6 +101,8 @@ resource "azurerm_mssql_database" "main" {
 }
 
 # Firewall rule to allow Azure services
+# SECURITY NOTE: This allows all Azure services to connect. For production, use more
+# restrictive firewall rules or implement Virtual Network integration with private endpoints.
 resource "azurerm_mssql_firewall_rule" "allow_azure_services" {
   name             = "AllowAzureServices"
   server_id        = azurerm_mssql_server.main.id
@@ -131,6 +133,9 @@ resource "azurerm_service_plan" "function" {
 }
 
 # Azure Function App
+# SECURITY NOTE: This configuration uses connection strings and access keys for simplicity.
+# For production, consider using managed identities and Azure Key Vault references instead.
+# See README.md for security best practices.
 resource "azurerm_linux_function_app" "main" {
   name                = "${var.project_name}-${var.environment}-func"
   location            = azurerm_resource_group.main.location

@@ -121,11 +121,34 @@ terraform destroy
 
 ## Security Considerations
 
-- Never commit `terraform.tfvars` to version control (it's in `.gitignore`)
-- Use Azure Key Vault for production secrets
-- Consider using managed identities instead of connection strings
-- Review and adjust firewall rules for production environments
-- The current SQL firewall rule allows all Azure services - restrict this in production
+⚠️ **IMPORTANT SECURITY NOTES**
+
+The current implementation uses connection strings and access keys for simplicity and ease of initial setup. For **production environments**, you should implement these security improvements:
+
+### Recommended Security Enhancements
+
+1. **Use Managed Identities**: Configure Azure Functions to use system-assigned or user-assigned managed identities for accessing:
+   - Cosmos DB (using RBAC instead of keys)
+   - ADLS Gen2 (using RBAC instead of access keys)
+   - Azure SQL (using Azure AD authentication)
+
+2. **Azure Key Vault Integration**: Store sensitive values in Azure Key Vault and reference them using Key Vault references in Function App settings
+
+3. **Restrict Network Access**:
+   - The current SQL firewall rule allows all Azure services (0.0.0.0)
+   - For production, implement Virtual Network integration and private endpoints
+   - Use specific IP ranges or private endpoints instead of allowing all Azure services
+
+4. **Credential Management**:
+   - Never commit `terraform.tfvars` to version control (already in `.gitignore`)
+   - Rotate SQL admin passwords regularly
+   - Consider using Azure AD authentication for SQL Server
+
+5. **Additional Recommendations**:
+   - Enable Azure Defender for all services
+   - Implement diagnostic logging and monitoring
+   - Use Azure Policy to enforce security standards
+   - Enable encryption at rest and in transit (enabled by default for most services)
 
 ## Next Steps
 
