@@ -33,7 +33,15 @@ This directory contains Terraform configuration files to deploy Azure infrastruc
    - Stores Cosmos DB primary key
    - Stores ADLS primary access key
    - Stores SQL connection string
+   - Stores service principal credentials
    - Access policy configured for current user/service principal
+
+6. **Service Principal**
+   - Azure AD application and service principal
+   - Contributor role on resource group
+   - Storage Blob Data Contributor role on ADLS
+   - Key Vault access policy for reading secrets
+   - Credentials stored in Key Vault
 
 ## Prerequisites
 
@@ -110,15 +118,17 @@ After successful deployment, Terraform will output:
 - Azure SQL Server FQDN and database name
 - Function App URL and configuration
 - Key Vault name, URI, and resource ID
+- Service Principal application ID and object ID
 
 To view outputs after deployment:
 ```bash
 terraform output
 ```
 
-To view sensitive outputs (like Cosmos DB keys):
+To view sensitive outputs (like Cosmos DB keys and service principal secrets):
 ```bash
 terraform output cosmos_db_primary_key
+terraform output service_principal_client_secret
 ```
 
 ## Resource Naming Convention
