@@ -108,6 +108,19 @@ resource "azurerm_cosmosdb_sql_container" "main" {
   }
 }
 
+# Cosmos DB SQL Container - Todo
+resource "azurerm_cosmosdb_sql_container" "todo" {
+  name                = "todo"
+  resource_group_name = azurerm_cosmosdb_account.main.resource_group_name
+  account_name        = azurerm_cosmosdb_account.main.name
+  database_name       = azurerm_cosmosdb_sql_database.main.name
+  partition_key_paths = ["/id"]
+
+  autoscale_settings {
+    max_throughput = var.cosmos_db_max_throughput
+  }
+}
+
 # Azure SQL Server
 resource "azurerm_mssql_server" "main" {
   name                         = "${var.project_name}-${var.environment}-sql"

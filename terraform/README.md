@@ -11,7 +11,9 @@ This directory contains Terraform configuration files to deploy Azure infrastruc
 2. **Cosmos DB**
    - Cosmos DB account with SQL API
    - Database: `maindb`
-   - Container: `items` with partition key `/id`
+   - Containers:
+     - `items` with partition key `/id`
+     - `todo` with partition key `/id`
    - Autoscale throughput configuration
 
 3. **Azure SQL Database**
@@ -154,7 +156,7 @@ The current implementation uses connection strings and access keys for simplicit
    - Key Vault (add access policy or use RBAC for secret access)
 
 2. **Azure Key Vault Integration**: 
-   - ✅ **Implemented**: Secrets are now stored in Azure Key Vault
+   - **Implemented**: Secrets are now stored in Azure Key Vault
    - **Next Step**: Update Function App to use Key Vault references (e.g., `@Microsoft.KeyVault(SecretUri=...)`) instead of direct connection strings
    - Configure managed identity for Function App to access Key Vault
 
