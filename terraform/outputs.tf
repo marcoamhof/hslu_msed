@@ -75,12 +75,12 @@ output "sql_database_name" {
 # Azure Functions Outputs
 output "function_app_name" {
   description = "Name of the Azure Function App"
-  value       = azurerm_linux_function_app.main.name
+  value       = azurerm_windows_function_app.main.name
 }
 
 output "function_app_url" {
   description = "Default hostname of the Azure Function App"
-  value       = "https://${azurerm_linux_function_app.main.default_hostname}"
+  value       = "https://${azurerm_windows_function_app.main.default_hostname}"
 }
 
 output "function_storage_account_name" {
@@ -92,3 +92,20 @@ output "app_service_plan_name" {
   description = "Name of the App Service Plan"
   value       = azurerm_service_plan.function.name
 }
+
+# Key Vault Outputs
+output "key_vault_name" {
+  description = "Name of the Azure Key Vault"
+  value       = azurerm_key_vault.main.name
+}
+
+output "key_vault_uri" {
+  description = "URI of the Azure Key Vault"
+  value       = azurerm_key_vault.main.vault_uri
+}
+
+output "key_vault_id" {
+  description = "Resource ID of the Azure Key Vault"
+  value       = azurerm_key_vault.main.id
+}
+

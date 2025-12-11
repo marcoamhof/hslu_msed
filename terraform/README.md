@@ -20,15 +20,33 @@ This directory contains Terraform configuration files to deploy Azure infrastruc
    - Firewall rule to allow Azure services
 
 4. **Azure Functions**
-   - Linux App Service Plan (Consumption plan by default)
-   - Function App with Python runtime
+   - Windows App Service Plan (Consumption plan by default)
+   - Function App with .NET runtime (C#)
    - Storage account for function app
    - Pre-configured app settings with connection strings
+
+5. **Azure Key Vault**
+   - Key Vault for secure storage of secrets
+   - Stores SQL admin password
+   - Stores Cosmos DB primary key
+   - Stores ADLS primary access key
+   - Stores SQL connection string
+   - Access policy configured for current user/service principal
 
 ## Prerequisites
 
 - [Terraform](https://www.terraform.io/downloads.html) >= 1.0
+  ```powershell
+  # Install Terraform on Windows using winget
+  winget install Hashicorp.Terraform
+  # Restart your terminal after installation
+  ```
 - [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
+  ```powershell
+  # Install Azure CLI on Windows using winget
+  winget install Microsoft.AzureCLI
+  # Restart your terminal after installation
+  ```
 - Azure subscription
 
 ## Setup
@@ -89,6 +107,7 @@ After successful deployment, Terraform will output:
 - Cosmos DB endpoint and database/container names
 - Azure SQL Server FQDN and database name
 - Function App URL and configuration
+- Key Vault name, URI, and resource ID
 
 To view outputs after deployment:
 ```bash
@@ -109,6 +128,7 @@ Example with defaults:
 - Cosmos DB: `hslumsed-dev-cosmos`
 - SQL Server: `hslumsed-dev-sql`
 - Function App: `hslumsed-dev-func`
+- Key Vault: `hslumsed-dev-kv`
 
 Storage accounts remove hyphens and environment suffix: `hslumseddevadls`, `hslumseddevfunc`
 
@@ -131,8 +151,12 @@ The current implementation uses connection strings and access keys for simplicit
    - Cosmos DB (using RBAC instead of keys)
    - ADLS Gen2 (using RBAC instead of access keys)
    - Azure SQL (using Azure AD authentication)
+   - Key Vault (add access policy or use RBAC for secret access)
 
-2. **Azure Key Vault Integration**: Store sensitive values in Azure Key Vault and reference them using Key Vault references in Function App settings
+2. **Azure Key Vault Integration**: 
+   - ✅ **Implemented**: Secrets are now stored in Azure Key Vault
+   - **Next Step**: Update Function App to use Key Vault references (e.g., `@Microsoft.KeyVault(SecretUri=...)`) instead of direct connection strings
+   - Configure managed identity for Function App to access Key Vault
 
 3. **Restrict Network Access**:
    - The current SQL firewall rule allows all Azure services (0.0.0.0)

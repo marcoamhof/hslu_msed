@@ -53,6 +53,37 @@ resource "azurerm_cosmosdb_account" "main" {
   tags = var.tags
 }
 
+# Data source to get current client configuration
+data "azurerm_client_config" "current" {}
+
+# Azure Key Vault
+resource "azurerm_key_vault" "main" {
+  name                       = "${var.project_name}-${var.environment}-kv"
+  location                   = azurerm_resource_group.main.location
+  resource_group_name        = azurerm_resource_group.main.name
+  tenant_id                  = data.azurerm_client_config.current.tenant_id
+  sku_name                   = var.key_vault_sku_name
+  soft_delete_retention_days = 7
+  purge_protection_enabled   = false
+
+  # Access policy for the current user/service principal
+  access_policy {
+    tenant_id = data.azurerm_client_config.current.tenant_id
+    object_id = data.azurerm_client_config.current.object_id
+
+    secret_permissions = [
+      "Get",
+      "List",
+      "Set",
+      "Delete",
+      "Purge",
+      "Recover"
+    ]
+  }
+
+  tags = var.tags
+}
+
 # Cosmos DB SQL Database
 resource "azurerm_cosmosdb_sql_database" "main" {
   name                = "maindb"
@@ -126,17 +157,50 @@ resource "azurerm_service_plan" "function" {
   name                = "${var.project_name}-${var.environment}-asp"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
-  os_type             = "Linux"
+  os_type             = "Windows"
   sku_name            = var.function_app_service_plan_sku
 
   tags = var.tags
+}
+
+# Key Vault Secrets
+resource "azurerm_key_vault_secret" "sql_admin_password" {
+  name         = "sql-admin-password"
+  value        = var.sql_admin_password
+  key_vault_id = azurerm_key_vault.main.id
+
+  depends_on = [azurerm_key_vault.main]
+}
+
+resource "azurerm_key_vault_secret" "cosmos_db_primary_key" {
+  name         = "cosmos-db-primary-key"
+  value        = azurerm_cosmosdb_account.main.primary_key
+  key_vault_id = azurerm_key_vault.main.id
+
+  depends_on = [azurerm_key_vault.main]
+}
+
+resource "azurerm_key_vault_secret" "adls_primary_key" {
+  name         = "adls-primary-key"
+  value        = azurerm_storage_account.adls.primary_access_key
+  key_vault_id = azurerm_key_vault.main.id
+
+  depends_on = [azurerm_key_vault.main]
+}
+
+resource "azurerm_key_vault_secret" "sql_connection_string" {
+  name         = "sql-connection-string"
+  value        = "Server=tcp:${azurerm_mssql_server.main.fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.main.name};Persist Security Info=False;User ID=${var.sql_admin_username};Password=${var.sql_admin_password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+  key_vault_id = azurerm_key_vault.main.id
+
+  depends_on = [azurerm_key_vault.main]
 }
 
 # Azure Function App
 # SECURITY NOTE: This configuration uses connection strings and access keys for simplicity.
 # For production, consider using managed identities and Azure Key Vault references instead.
 # See README.md for security best practices.
-resource "azurerm_linux_function_app" "main" {
+resource "azurerm_windows_function_app" "main" {
   name                = "${var.project_name}-${var.environment}-func"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
@@ -147,7 +211,7 @@ resource "azurerm_linux_function_app" "main" {
 
   site_config {
     application_stack {
-      python_version = var.function_runtime_version
+      dotnet_version = var.function_runtime_version
     }
   }
 

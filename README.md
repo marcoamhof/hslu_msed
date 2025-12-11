@@ -12,14 +12,25 @@ The project deploys the following Azure services:
 - **Azure Data Lake Storage Gen2 (ADLS Gen2)**: Scalable data lake for analytics workloads
 - **Cosmos DB**: Globally distributed NoSQL database with SQL API
 - **Azure SQL Database**: Managed relational database service
-- **Azure Functions**: Serverless compute platform for event-driven applications
+- **Azure Functions**: Serverless compute platform for event-driven applications (C# .NET runtime)
+- **Azure Key Vault**: Secure storage for secrets, keys, and certificates
 
 ## Getting Started
 
 ### Prerequisites
 
 - [Terraform](https://www.terraform.io/downloads.html) >= 1.0
+  ```powershell
+  # Install Terraform on Windows using winget
+  winget install Hashicorp.Terraform
+  # Restart your terminal after installation
+  ```
 - [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
+  ```powershell
+  # Install Azure CLI on Windows using winget
+  winget install Microsoft.AzureCLI
+  # Restart your terminal after installation
+  ```
 - Azure subscription with appropriate permissions
 
 ### Quick Start

@@ -42,7 +42,7 @@ wheels/
 htmlcov/
 
 # IDE
-.vscode/
+
 .idea/
 *.swp
 *.swo

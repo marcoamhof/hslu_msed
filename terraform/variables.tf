@@ -19,7 +19,7 @@ variable "location" {
 variable "resource_group_name" {
   description = "Name of the resource group"
   type        = string
-  default     = ""
+  default     = "hslumsed"
 }
 
 # ADLS Gen2 Variables
@@ -94,13 +94,20 @@ variable "function_app_service_plan_sku" {
 variable "function_runtime" {
   description = "Runtime for Azure Functions"
   type        = string
-  default     = "python"
+  default     = "dotnet"
 }
 
 variable "function_runtime_version" {
-  description = "Runtime version for Azure Functions"
+  description = "Runtime version for Azure Functions (.NET version: v6.0, v7.0, v8.0)"
   type        = string
-  default     = "3.9"
+  default     = "v8.0"
+}
+
+# Key Vault Variables
+variable "key_vault_sku_name" {
+  description = "SKU name for Azure Key Vault"
+  type        = string
+  default     = "standard"
 }
 
 variable "tags" {
