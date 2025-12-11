@@ -109,3 +109,20 @@ output "key_vault_id" {
   value       = azurerm_key_vault.main.id
 }
 
+# Service Principal Outputs
+output "service_principal_application_id" {
+  description = "Application (client) ID of the service principal"
+  value       = azuread_application.main.client_id
+}
+
+output "service_principal_object_id" {
+  description = "Object ID of the service principal"
+  value       = azuread_service_principal.main.object_id
+}
+
+output "service_principal_client_secret" {
+  description = "Client secret for the service principal"
+  value       = azuread_service_principal_password.main.value
+  sensitive   = true
+}
+

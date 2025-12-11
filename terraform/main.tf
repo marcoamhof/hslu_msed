@@ -241,3 +241,69 @@ resource "azurerm_windows_function_app" "main" {
 
   tags = var.tags
 }
+
+# Azure AD Application for Service Principal
+resource "azuread_application" "main" {
+  display_name = "${var.project_name}-${var.environment}-app"
+}
+
+# Service Principal
+resource "azuread_service_principal" "main" {
+  client_id = azuread_application.main.client_id
+}
+
+# Service Principal Password
+resource "azuread_service_principal_password" "main" {
+  service_principal_id = azuread_service_principal.main.object_id
+}
+
+# Role Assignment - Contributor on Resource Group
+resource "azurerm_role_assignment" "sp_contributor" {
+  scope                = azurerm_resource_group.main.id
+  role_definition_name = "Contributor"
+  principal_id         = azuread_service_principal.main.object_id
+}
+
+# Role Assignment - Storage Blob Data Contributor on ADLS
+resource "azurerm_role_assignment" "sp_storage_blob" {
+  scope                = azurerm_storage_account.adls.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azuread_service_principal.main.object_id
+}
+
+# Key Vault Access Policy for Service Principal
+resource "azurerm_key_vault_access_policy" "sp" {
+  key_vault_id = azurerm_key_vault.main.id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = azuread_service_principal.main.object_id
+
+  secret_permissions = [
+    "Get",
+    "List"
+  ]
+}
+
+# Store Service Principal credentials in Key Vault
+resource "azurerm_key_vault_secret" "sp_client_id" {
+  name         = "sp-client-id"
+  value        = azuread_application.main.client_id
+  key_vault_id = azurerm_key_vault.main.id
+
+  depends_on = [azurerm_key_vault.main]
+}
+
+resource "azurerm_key_vault_secret" "sp_client_secret" {
+  name         = "sp-client-secret"
+  value        = azuread_service_principal_password.main.value
+  key_vault_id = azurerm_key_vault.main.id
+
+  depends_on = [azurerm_key_vault.main]
+}
+
+resource "azurerm_key_vault_secret" "sp_tenant_id" {
+  name         = "sp-tenant-id"
+  value        = data.azurerm_client_config.current.tenant_id
+  key_vault_id = azurerm_key_vault.main.id
+
+  depends_on = [azurerm_key_vault.main]
+}
