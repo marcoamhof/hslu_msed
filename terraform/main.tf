@@ -253,6 +253,11 @@ resource "azurerm_windows_function_app" "main" {
     application_stack {
       dotnet_version = var.function_runtime_version
     }
+    use_32_bit_worker = false
+    cors {
+      allowed_origins = ["*"]
+      support_credentials = false
+    }
   }
 
   app_settings = {
