@@ -2,6 +2,10 @@
 
 This directory contains Terraform configuration files to deploy Azure infrastructure for the HSLU MSED project.
 
+## Architecture Diagram
+
+See [drawing.mmd](drawing.mmd) for a visual overview of the infrastructure architecture.
+
 ## Resources Deployed
 
 1. **Azure Data Lake Storage Gen2 (ADLS Gen2)**
@@ -49,9 +53,12 @@ This directory contains Terraform configuration files to deploy Azure infrastruc
    - Key Vault access policy for reading secrets
    - Credentials stored in Key Vault
 
+
+
 ## Prerequisites
 
 - [Terraform](https://www.terraform.io/downloads.html) >= 1.0
+
   ```powershell
   # Install Terraform on Windows using winget
   winget install Hashicorp.Terraform
