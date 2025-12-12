@@ -144,6 +144,17 @@ resource "azurerm_mssql_database" "main" {
   tags = var.tags
 }
 
+# Azure SQL Database - ToDo
+resource "azurerm_mssql_database" "todo" {
+  name        = "ToDo"
+  server_id   = azurerm_mssql_server.main.id
+  collation   = "SQL_Latin1_General_CP1_CI_AS"
+  max_size_gb = 2
+  sku_name    = "Basic"
+
+  tags = var.tags
+}
+
 # Firewall rule to allow Azure services
 # SECURITY NOTE: This allows all Azure services to connect. For production, use more
 # restrictive firewall rules or implement Virtual Network integration with private endpoints.
@@ -204,6 +215,22 @@ resource "azurerm_key_vault_secret" "adls_primary_key" {
 resource "azurerm_key_vault_secret" "sql_connection_string" {
   name         = "sql-connection-string"
   value        = "Server=tcp:${azurerm_mssql_server.main.fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.main.name};Persist Security Info=False;User ID=${var.sql_admin_username};Password=${var.sql_admin_password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+  key_vault_id = azurerm_key_vault.main.id
+
+  depends_on = [azurerm_key_vault.main]
+}
+
+resource "azurerm_key_vault_secret" "sql_writer_password" {
+  name         = "sql-writer-password"
+  value        = var.sql_writer_password
+  key_vault_id = azurerm_key_vault.main.id
+
+  depends_on = [azurerm_key_vault.main]
+}
+
+resource "azurerm_key_vault_secret" "sql_todo_connection_string" {
+  name         = "sql-todo-connection-string"
+  value        = "Server=tcp:${azurerm_mssql_server.main.fully_qualified_domain_name},1433;Initial Catalog=ToDo;Persist Security Info=False;User ID=sql-writer;Password=${var.sql_writer_password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
   key_vault_id = azurerm_key_vault.main.id
 
   depends_on = [azurerm_key_vault.main]

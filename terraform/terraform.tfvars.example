@@ -20,6 +20,7 @@ cosmos_db_max_throughput     = 1000
 # Azure SQL Configuration
 sql_admin_username = "sqladmin"
 sql_admin_password = "YourSecurePassword123!" # IMPORTANT: Change this!
+sql_writer_password = "YourSecureWriterPassword123!" # IMPORTANT: Change this!
 sql_db_sku_name    = "Basic" # Options: Basic, S0, S1, S2, P1, P2, etc.
 sql_db_max_size_gb = 2
 

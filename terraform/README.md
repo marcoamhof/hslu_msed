@@ -18,7 +18,12 @@ This directory contains Terraform configuration files to deploy Azure infrastruc
 
 3. **Azure SQL Database**
    - SQL Server instance
-   - SQL Database with configurable SKU
+   - Databases:
+     - Main database with configurable SKU
+     - `ToDo` database (Basic SKU, 2GB)
+   - SQL Users:
+     - Admin user (full access)
+     - `sql-writer` user (read/write access to ToDo database)
    - Firewall rule to allow Azure services
 
 4. **Azure Functions**
@@ -30,9 +35,10 @@ This directory contains Terraform configuration files to deploy Azure infrastruc
 5. **Azure Key Vault**
    - Key Vault for secure storage of secrets
    - Stores SQL admin password
+   - Stores SQL writer password
    - Stores Cosmos DB primary key
    - Stores ADLS primary access key
-   - Stores SQL connection string
+   - Stores SQL connection strings (main and ToDo databases)
    - Stores service principal credentials
    - Access policy configured for current user/service principal
 
@@ -74,6 +80,7 @@ This directory contains Terraform configuration files to deploy Azure infrastruc
    
    Edit `terraform.tfvars` and set your desired values, especially:
    - `sql_admin_password` (use a strong password)
+   - `sql_writer_password` (use a strong password for the sql-writer user)
    - `project_name` (must be unique for storage accounts)
    - Other configuration parameters as needed
 
@@ -97,6 +104,7 @@ This directory contains Terraform configuration files to deploy Azure infrastruc
 ### Required Variables
 
 - `sql_admin_password`: Password for the SQL Server administrator account (sensitive)
+- `sql_writer_password`: Password for the sql-writer user account (sensitive)
 
 ### Optional Variables
 
@@ -115,7 +123,7 @@ After successful deployment, Terraform will output:
 - Resource group details
 - ADLS Gen2 endpoints and filesystem names
 - Cosmos DB endpoint and database/container names
-- Azure SQL Server FQDN and database name
+- Azure SQL Server FQDN and database names (main and ToDo)
 - Function App URL and configuration
 - Key Vault name, URI, and resource ID
 - Service Principal application ID and object ID
@@ -153,7 +161,7 @@ terraform destroy
 
 ## Security Considerations
 
-⚠️ **IMPORTANT SECURITY NOTES**
+**IMPORTANT SECURITY NOTES**
 
 The current implementation uses connection strings and access keys for simplicity and ease of initial setup. For **production environments**, you should implement these security improvements:
 
@@ -190,20 +198,56 @@ The current implementation uses connection strings and access keys for simplicit
 
 After deploying the infrastructure:
 
-1. **Deploy Azure Functions code**
+1. **Create SQL Writer User** (Manual Step)
+   
+   The `sql-writer` user needs to be created manually in the ToDo database. Connect to your SQL Server and run:
+   
+   ```sql
+   -- Connect to master database first
+   USE master;
+   GO
+   
+   -- Create login (use the password from your terraform.tfvars)
+   IF NOT EXISTS (SELECT * FROM sys.server_principals WHERE name = 'sql-writer')
+   BEGIN
+       CREATE LOGIN [sql-writer] WITH PASSWORD = 'YourSecureWriterPassword123!';
+   END
+   GO
+   
+   -- Switch to ToDo database
+   USE ToDo;
+   GO
+   
+   -- Create user and assign roles
+   IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = 'sql-writer')
+   BEGIN
+       CREATE USER [sql-writer] FOR LOGIN [sql-writer];
+       ALTER ROLE db_datareader ADD MEMBER [sql-writer];
+       ALTER ROLE db_datawriter ADD MEMBER [sql-writer];
+   END
+   GO
+   ```
+   
+   You can run this using:
+   - Azure Portal Query Editor
+   - SQL Server Management Studio (SSMS)
+   - Azure Data Studio
+   - sqlcmd command-line tool
+
+2. **Deploy Azure Functions code**
    - Navigate to the Function App in Azure Portal
    - Use VS Code Azure Functions extension, or
    - Use Azure CLI: `az functionapp deployment source config-zip`
 
-2. **Configure ADLS Gen2**
+3. **Configure ADLS Gen2**
    - Set up access control (ACLs)
    - Configure lifecycle management policies
 
-3. **Set up Cosmos DB**
+4. **Set up Cosmos DB**
    - Create additional containers as needed
    - Configure indexing policies
 
-4. **Configure Azure SQL**
+5. **Configure Azure SQL**
    - Run database migrations
    - Set up additional firewall rules
    - Configure geo-replication if needed

@@ -72,6 +72,17 @@ variable "sql_admin_password" {
   }
 }
 
+variable "sql_writer_password" {
+  description = "Password for SQL writer user (min 8 chars, must include uppercase, lowercase, numbers, and special characters)"
+  type        = string
+  sensitive   = true
+  
+  validation {
+    condition     = length(var.sql_writer_password) >= 8
+    error_message = "SQL writer password must be at least 8 characters long."
+  }
+}
+
 variable "sql_db_sku_name" {
   description = "SKU name for Azure SQL Database"
   type        = string

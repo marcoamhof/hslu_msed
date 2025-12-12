@@ -72,6 +72,11 @@ output "sql_database_name" {
   value       = azurerm_mssql_database.main.name
 }
 
+output "sql_todo_database_name" {
+  description = "Name of the ToDo SQL Database"
+  value       = azurerm_mssql_database.todo.name
+}
+
 # Azure Functions Outputs
 output "function_app_name" {
   description = "Name of the Azure Function App"
