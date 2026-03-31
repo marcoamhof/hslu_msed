@@ -1,0 +1,29 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "azfunction", "azfunction", "{9AB5A474-7D7D-3963-0863-E16FC64B60C8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HsluMsedFunction", "azfunction\HsluMsedFunction.csproj", "{5935AF80-CC92-04E0-CC39-8F4C195B8F51}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5935AF80-CC92-04E0-CC39-8F4C195B8F51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5935AF80-CC92-04E0-CC39-8F4C195B8F51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5935AF80-CC92-04E0-CC39-8F4C195B8F51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5935AF80-CC92-04E0-CC39-8F4C195B8F51}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5935AF80-CC92-04E0-CC39-8F4C195B8F51} = {9AB5A474-7D7D-3963-0863-E16FC64B60C8}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5C474C1E-3CC6-4E56-BD66-E5797A046DAF}
+	EndGlobalSection
+EndGlobal

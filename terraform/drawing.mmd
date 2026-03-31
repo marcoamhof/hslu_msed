@@ -1,0 +1,108 @@
+graph TB
+    subgraph Azure["Azure Subscription"]
+        RG[Resource Group<br/>hslumsed-dev-rg]
+        
+        subgraph Storage["Storage Services"]
+            ADLS[ADLS Gen2<br/>hslumseddevadls]
+            ADLS_DATA[Filesystem: data]
+            ADLS_RAW[Filesystem: raw]
+            ADLS_PROC[Filesystem: processed]
+            FUNC_STORAGE[Function Storage<br/>hslumseddevfunc]
+        end
+        
+        subgraph Database["Database Services"]
+            COSMOS[Cosmos DB<br/>hslumsed-dev-cosmos]
+            COSMOS_DB[Database: maindb]
+            COSMOS_ITEMS[Container: items]
+            COSMOS_TODO[Container: todo]
+            
+            SQL_SERVER[SQL Server<br/>hslumsed-dev-sql]
+            SQL_DB_MAIN[Database: hslumsed-dev-db]
+            SQL_DB_TODO[Database: ToDo]
+            SQL_FW[Firewall Rule<br/>Allow Azure Services]
+            SQL_USER[SQL User: sql-writer<br/>db_datareader + db_datawriter]
+        end
+        
+        subgraph Compute["Compute Services"]
+            ASP[App Service Plan<br/>hslumsed-dev-asp<br/>Windows/Y1]
+            FUNC[Function App<br/>hslumsed-dev-func<br/>.NET 8.0]
+        end
+        
+        subgraph Security["Security & Identity"]
+            KV[Key Vault<br/>hslumsed-dev-kv]
+            KV_SQL_ADMIN[Secret: sql-admin-password]
+            KV_SQL_WRITER[Secret: sql-writer-password]
+            KV_COSMOS[Secret: cosmos-db-primary-key]
+            KV_ADLS[Secret: adls-primary-key]
+            KV_SQL_CONN[Secret: sql-connection-string]
+            KV_SQL_TODO[Secret: sql-todo-connection-string]
+            KV_SP_ID[Secret: sp-client-id]
+            KV_SP_SECRET[Secret: sp-client-secret]
+            KV_SP_TENANT[Secret: sp-tenant-id]
+            
+            AAD_APP[Azure AD Application<br/>hslumsed-dev-app]
+            SP[Service Principal]
+            SP_PWD[SP Password]
+        end
+    end
+    
+    %% Resource Group Relationships
+    RG -->|contains| ADLS
+    RG -->|contains| COSMOS
+    RG -->|contains| SQL_SERVER
+    RG -->|contains| KV
+    RG -->|contains| ASP
+    RG -->|contains| FUNC_STORAGE
+    
+    %% Storage Relationships
+    ADLS -->|has| ADLS_DATA
+    ADLS -->|has| ADLS_RAW
+    ADLS -->|has| ADLS_PROC
+    
+    %% Cosmos DB Relationships
+    COSMOS -->|has| COSMOS_DB
+    COSMOS_DB -->|has| COSMOS_ITEMS
+    COSMOS_DB -->|has| COSMOS_TODO
+    
+    %% SQL Server Relationships
+    SQL_SERVER -->|has| SQL_DB_MAIN
+    SQL_SERVER -->|has| SQL_DB_TODO
+    SQL_SERVER -->|has| SQL_FW
+    SQL_DB_TODO -->|has user| SQL_USER
+    
+    %% Compute Relationships
+    ASP -->|hosts| FUNC
+    FUNC -->|uses| FUNC_STORAGE
+    FUNC -->|connects to| COSMOS
+    FUNC -->|connects to| ADLS
+    FUNC -->|connects to| SQL_SERVER
+    
+    %% Key Vault Relationships
+    KV -->|stores| KV_SQL_ADMIN
+    KV -->|stores| KV_SQL_WRITER
+    KV -->|stores| KV_COSMOS
+    KV -->|stores| KV_ADLS
+    KV -->|stores| KV_SQL_CONN
+    KV -->|stores| KV_SQL_TODO
+    KV -->|stores| KV_SP_ID
+    KV -->|stores| KV_SP_SECRET
+    KV -->|stores| KV_SP_TENANT
+    
+    %% Service Principal Relationships
+    AAD_APP -->|creates| SP
+    SP -->|has| SP_PWD
+    SP -->|Contributor role| RG
+    SP -->|Storage Blob Data Contributor| ADLS
+    SP -->|can read secrets| KV
+    
+    %% Styling
+    classDef storage fill:#0078d4,stroke:#005a9e,color:#fff
+    classDef database fill:#00bcf2,stroke:#0099bc,color:#000
+    classDef compute fill:#ff6b00,stroke:#cc5500,color:#fff
+    classDef security fill:#7fba00,stroke:#5c8700,color:#000
+    classDef container fill:#e3f2fd,stroke:#90caf9,color:#000
+    
+    class ADLS,ADLS_DATA,ADLS_RAW,ADLS_PROC,FUNC_STORAGE storage
+    class COSMOS,COSMOS_DB,COSMOS_ITEMS,COSMOS_TODO,SQL_SERVER,SQL_DB_MAIN,SQL_DB_TODO database
+    class ASP,FUNC compute
+    class KV,KV_SQL_ADMIN,KV_SQL_WRITER,KV_COSMOS,KV_ADLS,KV_SQL_CONN,KV_SQL_TODO,KV_SP_ID,KV_SP_SECRET,KV_SP_TENANT,AAD_APP,SP,SP_PWD security

@@ -1,0 +1,37 @@
+# Example terraform.tfvars file
+# Copy this file to terraform.tfvars and adjust the values
+
+project_name = "hslumsed"
+environment  = "dev"
+location     = "westeurope"
+
+# Optional: Specify custom resource group name
+# resource_group_name = "my-custom-rg"
+
+# ADLS Gen2 Configuration
+adls_account_tier      = "Standard"
+adls_replication_type  = "LRS" # Options: LRS, GRS, RAGRS, ZRS, GZRS, RAGZRS
+
+# Cosmos DB Configuration
+cosmos_db_offer_type         = "Standard"
+cosmos_db_consistency_level  = "Session" # Options: BoundedStaleness, Eventual, Session, Strong, ConsistentPrefix
+cosmos_db_max_throughput     = 1000
+
+# Azure SQL Configuration
+sql_admin_username = "sqladmin"
+sql_admin_password = "YourSecurePassword123!" # IMPORTANT: Change this!
+sql_writer_password = "YourSecureWriterPassword123!" # IMPORTANT: Change this!
+sql_db_sku_name    = "Basic" # Options: Basic, S0, S1, S2, P1, P2, etc.
+sql_db_max_size_gb = 2
+
+# Azure Functions Configuration
+function_app_service_plan_sku = "Y1" # Y1 = Consumption plan, B1/B2/B3 = Basic, S1/S2/S3 = Standard, P1v2/P2v2/P3v2 = Premium
+function_runtime              = "dotnet"
+function_runtime_version      = "v8.0" # Options: v6.0, v7.0, v8.0
+
+# Tags
+tags = {
+  Project   = "HSLU MSED"
+  ManagedBy = "Terraform"
+  Owner     = "Your Name"
+}
